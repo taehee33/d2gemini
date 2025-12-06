@@ -1,0 +1,22 @@
+{
+  "name": "digimon-tamagotchi",
+  "version": "1.0.0",
+  "description": "현실 시간과 동기화되는 온라인 디지몬 다마고치 게임",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "npx http-server -p 8000",
+    "start": "npx http-server -p 8000"
+  },
+  "keywords": [
+    "digimon",
+    "tamagotchi",
+    "phaser",
+    "game"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
+

@@ -1,0 +1,64 @@
+{
+  "evolutionTree": {
+    "baby": {
+      "name": "아기 디지몬",
+      "evolutions": [
+        {
+          "to": "child",
+          "conditions": {
+            "age": 10,
+            "hunger": 50,
+            "happiness": 30
+          }
+        }
+      ]
+    },
+    "child": {
+      "name": "성장기 디지몬",
+      "evolutions": [
+        {
+          "to": "adult",
+          "conditions": {
+            "age": 60,
+            "hunger": 70,
+            "strength": 10,
+            "happiness": 50
+          }
+        }
+      ]
+    },
+    "adult": {
+      "name": "성숙기 디지몬",
+      "evolutions": [
+        {
+          "to": "perfect",
+          "conditions": {
+            "age": 300,
+            "hunger": 80,
+            "strength": 30,
+            "happiness": 70
+          }
+        }
+      ]
+    },
+    "perfect": {
+      "name": "완전체 디지몬",
+      "evolutions": [
+        {
+          "to": "ultimate",
+          "conditions": {
+            "age": 600,
+            "hunger": 90,
+            "strength": 50,
+            "happiness": 90
+          }
+        }
+      ]
+    },
+    "ultimate": {
+      "name": "궁극체 디지몬",
+      "evolutions": []
+    }
+  }
+}
+
