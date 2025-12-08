@@ -1,0 +1,6 @@
+[
+  { "id": "botamon", "name": "깜몬", "start_frame": 210 },
+  { "id": "koromon", "name": "코로몬", "start_frame": 225 },
+  { "id": "agumon", "name": "아구몬", "start_frame": 240 }
+]
+

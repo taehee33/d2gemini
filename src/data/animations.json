@@ -1,0 +1,19 @@
+{
+  "idle": [1, 2, 8],
+  "eat": [1, 10, 9],
+  "refuse": [11],
+  "train_ready": [5],
+  "train_fire": [6],
+  "success": [2, 3],
+  "fail": [7, 4],
+  "sleep": [12, 13],
+  "freeze": [1, 15, 3],
+  "sick_status": [14, 15],
+  "evolve": [15],
+  "battle_start": [2, 8],
+  "battle_fire": [7, 8],
+  "battle_wait": [7],
+  "battle_lose": [2, 15],
+  "meat": [526, 527, 528, 529]
+}
+
