@@ -145,3 +145,4 @@ this.isBusy = true; 설정.
 - [ ] 애니메이션 속도 설정을 JSON으로 분리
 - [ ] 버튼 비활성화 UI 추가 (isBusy일 때)
 
+

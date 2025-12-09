@@ -41,11 +41,6 @@ export class Digimon extends Phaser.GameObjects.Container {
         this.digimonSprite = scene.add.sprite(0, 0, 'digimon_210');
         this.add(this.digimonSprite);
         
-        // 기본 idle 애니메이션 재생
-        if (this.animationManager) {
-            this.animationManager.play('idle', 'botamon');
-        }
-        
         // 배고픔 수치 표시 텍스트 (디지몬 위쪽에 표시)
         this.hungerText = scene.add.text(0, -80, `배고픔: ${Math.floor(this.data.hunger)}`, {
             fontSize: '20px',
@@ -58,6 +53,9 @@ export class Digimon extends Phaser.GameObjects.Container {
         
         // 씬에 추가
         scene.add.existing(this);
+        
+        // 초기화 완료 후 idle 상태로 설정
+        this.resetToIdle();
     }
     
     /**
@@ -91,6 +89,40 @@ export class Digimon extends Phaser.GameObjects.Container {
      */
     getStatus() {
         return { ...this.data };
+    }
+    
+    /**
+     * Idle 상태로 강제 복귀 (중앙 집중형 상태 관리)
+     * 디지몬의 상태를 강제로 평상시로 되돌리는 역할
+     */
+    resetToIdle() {
+        try {
+            // 1. 바쁨 상태 해제
+            this.isBusy = false;
+            
+            // 2. 밥 먹기, 똥 싸기 등으로 등록된 모든 이벤트 제거
+            if (this.digimonSprite) {
+                this.digimonSprite.removeAllListeners();
+            }
+            
+            // 3. 현재 애니메이션 정지
+            if (this.digimonSprite) {
+                this.digimonSprite.anims.stop();
+            }
+            
+            // 4. Idle 재생 (무조건 실행, ignoreIfPlaying: false)
+            const currentSpecies = this.data.currentDigimonId || 'botamon';
+            if (this.animationManager) {
+                this.animationManager.play('idle', currentSpecies, {
+                    frameRate: 1.5,
+                    repeat: -1
+                });
+            }
+            
+            console.log('🔄 Idle 상태로 복귀 완료');
+        } catch (error) {
+            console.error('resetToIdle() 실행 중 오류:', error);
+        }
     }
     
     /**
@@ -167,17 +199,8 @@ export class Digimon extends Phaser.GameObjects.Container {
                                 this.digimonSprite.off('animationrepeat');
                             }
                             
-                            // 3. 중요: play('idle', this.currentSpecies, { frameRate: 1.5, repeat: -1 })
-                            // 여기서 반드시 frameRate를 1.5 정도로 낮춰서 명시해야 빨라지는 버그가 해결됨
-                            if (this.animationManager) {
-                                this.animationManager.play('idle', currentSpecies, {
-                                    frameRate: 1.5,
-                                    repeat: -1
-                                });
-                            }
-                            
-                            // 4. isBusy = false
-                            this.isBusy = false;
+                            // 3. resetToIdle() 호출 (중앙 집중형 상태 관리)
+                            this.resetToIdle();
                         }
                     } catch (error) {
                         console.error('animationrepeat 이벤트 처리 중 오류:', error);

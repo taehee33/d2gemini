@@ -21,69 +21,58 @@ export class AnimationManager {
     /**
      * 애니메이션 재생
      * @param {string} animationKey - 애니메이션 키 (예: 'idle', 'eat')
-     * @param {string} digimonId - 디지몬 ID (예: 'botamon', 'koromon')
-     * @param {number|object} options - 프레임 속도 (fps) 또는 옵션 객체 { frameRate, repeat }
-     * @param {Function} onComplete - 애니메이션 완료 시 호출될 콜백 (deprecated, 이벤트 사용 권장)
+     * @param {string} speciesId - 디지몬 ID (예: 'botamon', 'koromon')
+     * @param {object} options - 옵션 객체 { frameRate, repeat }
      */
-    play(animationKey, digimonId = 'botamon', options = {}, onComplete = null) {
-        // 옵션 파싱 (하위 호환성)
-        let frameRate = 5;
-        let repeat = 0; // 0 = 한 번만, -1 = 무한 반복
+    play(animationKey, speciesId, options = {}) {
+        // 1. 배열에서 내 디지몬 정보 찾기 (find 사용)
+        const speciesData = this.digimonList.find(d => d.id === speciesId);
         
-        if (typeof options === 'number') {
-            // 구형 호출 방식: play(key, id, frameRate)
-            frameRate = options;
-        } else if (typeof options === 'object') {
-            // 신형 호출 방식: play(key, id, { frameRate, repeat })
-            frameRate = options.frameRate || 5;
-            repeat = options.repeat !== undefined ? options.repeat : 0;
-        }
-        
-        // 1. digimon_list에서 digimonId에 해당하는 start_frame 찾기
-        const digimonInfo = this.digimonList.find(d => d.id === digimonId);
-        if (!digimonInfo) {
-            console.error(`디지몬 ID를 찾을 수 없습니다: ${digimonId}`);
+        if (!speciesData) {
+            console.error(`❌ 디지몬 데이터를 찾을 수 없음: ${speciesId}`);
             return;
         }
         
-        const startFrame = digimonInfo.start_frame;
-        
-        // 2. animations에서 animationKey에 해당하는 배열(패턴) 가져오기
+        // 2. 애니메이션 패턴 찾기
         const pattern = this.animations[animationKey];
         if (!pattern || !Array.isArray(pattern)) {
-            console.error(`애니메이션 패턴을 찾을 수 없습니다: ${animationKey}`);
+            console.error(`❌ 애니메이션 패턴을 찾을 수 없음: ${animationKey}`);
             return;
         }
         
-        // 3. 애니메이션 키 생성
-        const animKey = `${digimonId}_${animationKey}`;
+        // 3. 프레임 번호 계산 (String 변환 필수)
+        const frames = pattern.map(num => {
+            // 공식: 시작번호 + (패턴번호 - 1)
+            const frameNumber = speciesData.start_frame + (num - 1);
+            return { key: `digimon_${frameNumber}` };
+        });
         
-        // 4. 애니메이션이 없으면 생성
-        if (!this.createdAnimations.has(animKey)) {
-            this.createAnimation(animKey, startFrame, pattern, frameRate, repeat);
-            this.createdAnimations.add(animKey);
+        // 4. 애니메이션 생성 및 재생
+        const animKey = `${speciesId}_${animationKey}`;
+        
+        // 이미 존재하면 삭제하고 다시 만듦 (옵션 변경 대응)
+        if (this.scene.anims.exists(animKey)) {
+            this.scene.anims.remove(animKey);
         }
         
-        // 5. 현재 애니메이션 정보 저장
+        this.scene.anims.create({
+            key: animKey,
+            frames: frames,
+            frameRate: options.frameRate || 3, // 기본 속도
+            repeat: options.repeat !== undefined ? options.repeat : -1
+        });
+        
+        // 5. 확실하게 재생 (첫 프레임 강제 설정)
+        if (this.digimon.digimonSprite) {
+            this.digimon.digimonSprite.anims.stop();
+            this.digimon.digimonSprite.setTexture(frames[0].key); // 첫 이미지로 즉시 변경
+            // ignoreIfPlaying: false로 무조건 재생 (안전장치)
+            this.digimon.digimonSprite.play(animKey, false);
+        }
+        
+        // 현재 애니메이션 정보 저장
         this.currentAnimation = animationKey;
-        this.currentDigimonId = digimonId;
-        
-        // 6. 안전장치: 첫 번째 프레임으로 즉시 텍스처 변경
-        // 애니메이션이 바뀌는 순간 이전 이미지 잔상이 남거나 멈춰 보이는 현상을 막기 위함
-        if (this.digimon.digimonSprite) {
-            const firstPatternNum = pattern[0];
-            const firstFrameNumber = startFrame + (firstPatternNum - 1);
-            const firstTextureKey = `digimon_${firstFrameNumber}`;
-            
-            if (this.scene.textures.exists(firstTextureKey)) {
-                this.digimon.digimonSprite.setTexture(firstTextureKey);
-            }
-        }
-        
-        // 7. 애니메이션 재생
-        if (this.digimon.digimonSprite) {
-            this.digimon.digimonSprite.play(animKey);
-        }
+        this.currentDigimonId = speciesId;
     }
     
     /**

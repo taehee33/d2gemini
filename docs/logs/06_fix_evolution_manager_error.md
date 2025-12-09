@@ -161,3 +161,4 @@ digimonSprite.setFillStyle(...) 코드를 삭제해.
 - [ ] 진화 애니메이션 연출 추가
 - [ ] 더 많은 진화 단계 추가
 
+
